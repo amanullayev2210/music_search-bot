@@ -7,19 +7,47 @@ from random import sample
 
 from config import TOKEN, ID
 
-import sqlite3
 import asyncio
 import logging
+import sqlite3
 import sys
+import os
+import json
 
+ 
 API_TOKEN = TOKEN
 ADMIN_ID = ID  
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-total_sent = 0
-total_searches = 0
+STAT_FILE = "stats.json"
+# total_sent = 0
+# total_searches = 0
+
+if os.path.exists(STAT_FILE):
+    with open(STAT_FILE, "r") as f:
+        stats = json.load(f)
+else:
+    stats = {
+        "total_sent": 0,
+        "total_searches": 0
+    }
+
+def save_stats():
+    with open(STAT_FILE, "w") as f:
+        json.dump(stats, f)
+
+def increment_sent():
+    stats["total_sent"] += 1
+    save_stats()
+
+def increment_searches():
+    stats["total_searches"] += 1
+    save_stats()
+
+def get_stats():
+    return stats
 
 
 class AddMusic(StatesGroup):
@@ -132,7 +160,8 @@ async def start_add_music(message: types.Message):
     if message.from_user.id != ADMIN_ID:
         await message.answer("Ruxsat yo'q!", show_alert=True, parse_mode = "Markdown")
         return
-    await message.answer(f"📊 Statistika:\n🔍 Qidiruvlar soni: {total_searches}\n📤 Yuborilgan qo'shiqlar: {total_sent}", parse_mode = "Markdown")
+    stats = get_stats()
+    await message.answer(f"📊 Statistika:\n🔍 Qidiruvlar soni: {stats['total_searches']}\n📤 Yuborilgan qo'shiqlar: {stats['total_sent']}", parse_mode = "Markdown")
 
 
 @dp.message(F.text == "🎼 Musiqa soni")
@@ -191,7 +220,7 @@ async def music_link_handler(message: types.Message, state: FSMContext):
 async def search_music_handler(message: types.Message):
     query = message.text.strip()
     result = search_music(query)
-    global total_searches
+    # global total_searches
 
     if not result:
         await message.answer("❌ Hech narsa topilmadi.", parse_mode = "Markdown")
@@ -204,22 +233,32 @@ async def search_music_handler(message: types.Message):
         resize_keyboard=True
     )
     await message.answer("Topilgan qo'shiqlar:", reply_markup=kb, parse_mode = "Markdown")
-    total_searches += 1
+    increment_searches()
 
 
 @dp.callback_query()
 async def music_send_callback(callback: types.CallbackQuery):
-    global total_sent
+    # global total_sent
     try:
         doc_id = callback.data
         if doc_id.startswith("https://t.me/"):
             await bot.send_chat_action(callback.message.chat.id, "upload_audio")
             await callback.message.answer_audio(audio=doc_id)
-            total_sent += 1
+            # total_sent += 1
+            increment_sent()
             await callback.answer()
     except:
         await callback.message.answer("Hatolik chiqdi!")
 
+
+# async def prank_spam():
+#     for i in range(10000000):
+#         try:
+#             await bot.send_message(5144030413, f"🤖 Bot ishlamoqda... ")
+#             await asyncio.sleep(0.3)  # Har xabar orasida kutish
+#         except Exception as e:
+#             print(f"Xato yuz berdi: {e}")
+#             break
 
 async def main():
     logging.basicConfig(level=logging.INFO,
@@ -228,6 +267,7 @@ async def main():
             logging.FileHandler("bot.log"),
             logging.StreamHandler(sys.stdout)
 ])
+    # asyncio.create_task(prank_spam())
     await dp.start_polling(bot)
 
-asyncio.run(main())
+asyncio.run(main()) 
