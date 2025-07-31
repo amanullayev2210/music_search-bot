@@ -1,4 +1,48 @@
-bot.log
-config.py
-__pycache__
+# Python compiled files
+__pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Logs
+*.log
+bot.log
+
+# Config files
+config.py
+*.env
+.env.*
+
+# IDE/editor-specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+dist/
+*.egg-info/
+*.spec
+
+# Coverage/test
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Type checking
+.mypy_cache/
+.pyright/
