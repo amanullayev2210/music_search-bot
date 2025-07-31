@@ -13,7 +13,7 @@ Telegram uchun sun’iy intellekt asosidagi bot — foydalanuvchi yuborgan **voi
 
 1. Ushbu repozitoriyani klon qiling:
    ```bash
-   git clone https://github.com/amanullayev2210/music-finder-bot.git
+   git clone https://github.com/amanullayev2210/music-search-bot.git
    cd music-search-bot
    ```
 
